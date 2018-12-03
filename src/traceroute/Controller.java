@@ -4,58 +4,100 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.chart.AreaChart;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
 public class Controller {
-    @FXML Button start_btn;
-    @FXML Button clear_btn;
-    @FXML TextField textField;
-    @FXML TableView<TraceRoute> table;
-    @FXML TableColumn<TraceRoute, String> hopCol;
-    @FXML TableColumn<TraceRoute, String> ipCol;
-    @FXML TableColumn<TraceRoute, String> hostnameCol;
-    @FXML TableColumn<TraceRoute, String> avgCol;
+	@FXML
+	Button start_btn;
+	@FXML
+	Button clear_btn;
+	@FXML
+	TextField textField;
+	@FXML
+	TableView<TraceRoute> table;
+	@FXML
+	TableColumn<TraceRoute, String> hopCol;
+	@FXML
+	TableColumn<TraceRoute, String> ipCol;
+	@FXML
+	TableColumn<TraceRoute, String> hostnameCol;
+	@FXML
+	TableColumn<TraceRoute, String> avgCol;
+	@FXML
+	LineChart<String, Number> chart;
 
-    private TraceRoute t;
+	private TraceRoute t;
+	private XYChart.Series<String, Number> series = new XYChart.Series<String, Number>();
 
-    public void handleStart(ActionEvent e){
-        ObservableList<TraceRoute> data = FXCollections.observableArrayList();
-        String url = textField.getText().trim();
+	@FXML
+	public void initialize() {
+		series.setName("Visual Route");
+		chart.setAnimated(true);
+	}
 
-        hopCol.setCellValueFactory(new PropertyValueFactory<>("hop"));
-        ipCol.setCellValueFactory(new PropertyValueFactory<>("ip"));
-        hostnameCol.setCellValueFactory(new PropertyValueFactory<>("hostname"));
+	public void handleStart(ActionEvent e) {
+		ObservableList<TraceRoute> data = FXCollections.observableArrayList();
+		String url = textField.getText().trim();
 
-        if(!url.isEmpty()){
-            int n = 0, numHop = 1;
-            ArrayList<String> output = new ArrayList<String>();
-            TraceRoute tr = new TraceRoute();
-            output = tr.start(url);
+		hopCol.setCellValueFactory(new PropertyValueFactory<>("hop"));
+		ipCol.setCellValueFactory(new PropertyValueFactory<>("ip"));
+		hostnameCol.setCellValueFactory(new PropertyValueFactory<>("hostname"));
+		avgCol.setCellValueFactory(new PropertyValueFactory<>("time"));
 
-            for(String x : output){
-                if(n != 0) {
-                    String[] s = x.split(" ");
-                    t = new TraceRoute(numHop, s[3], s[4]);
+		if (!url.isEmpty()) {
+			int n = 0, numHop = 1;
+			ArrayList<String> output = new ArrayList<String>();
+			TraceRoute tr = new TraceRoute();
+			double time;
+			output = tr.start(url);
 
-                    data.add(t);
+			for (String x : output) {
+				if (n != 0) {
+					String[] s = x.split(" ");
+					try {
+						if (numHop < 10) {
+							time = Double.parseDouble(s[6]);
+						} else {
+							time = Double.parseDouble(s[5]);
+						}
+					} catch (ArrayIndexOutOfBoundsException | NumberFormatException ex) {
+						time = 0;
+					}
+					if (numHop < 10) {
+						t = new TraceRoute(numHop, s[3], s[4], time);
+					} else {
+						t = new TraceRoute(numHop, s[2], s[3], time);
+					}
+					data.add(t);
+					table.setItems(data);
+					series.getData().add(new XYChart.Data<String, Number>(t.getHop()+"", t.getTime()));
 
-                    table.setItems(data);
-                    numHop++;
-                }
-                n++;
-            }
-        }else{
+					numHop++;
+				}
 
-        }
-    }
+				n++;
+			}
+			chart.getData().add(series);
+		} else {
 
-    public void handleClear(ActionEvent e){
-        textField.clear();
-    }
+		}
+	}
+
+	public void handleClear(ActionEvent e) {
+		textField.clear();
+		chart.getData().clear();
+		table.getItems().clear();
+	}
+
 }

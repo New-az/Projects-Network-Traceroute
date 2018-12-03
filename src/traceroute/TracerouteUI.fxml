@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="traceroute.Controller">
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="traceroute.Controller">
    <children>
       <Button fx:id="start_btn" layoutX="318.0" layoutY="28.0" mnemonicParsing="false" onAction="#handleStart" text="Start" />
       <TextField fx:id="textField" layoutX="123.0" layoutY="28.0" prefHeight="25.0" prefWidth="182.0" />
@@ -19,5 +24,18 @@
             <TableColumn fx:id="avgCol" prefWidth="100.0" text="AVG" />
         </columns>
       </TableView>
+      <Label layoutX="597.0" layoutY="53.0" text="Visual Route">
+         <font>
+            <Font size="45.0" />
+         </font>
+      </Label>
+      <LineChart fx:id="chart" layoutX="475.0" layoutY="126.0">
+        <xAxis>
+          <CategoryAxis side="BOTTOM" />
+        </xAxis>
+        <yAxis>
+          <NumberAxis side="LEFT" />
+        </yAxis>
+      </LineChart>
    </children>
 </Pane>

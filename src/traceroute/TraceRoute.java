@@ -1,5 +1,6 @@
 package traceroute;
 
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 
@@ -14,13 +15,15 @@ public class TraceRoute {
     private SimpleIntegerProperty hop;
     private SimpleStringProperty ip;
     private SimpleStringProperty hostname;
+    private SimpleDoubleProperty time;
 
     public TraceRoute(){}
 
-    public TraceRoute(int hop, String ip, String hostname){
+    public TraceRoute(int hop, String ip, String hostname, double time){
         this.hop = new SimpleIntegerProperty(hop);
         this.ip = new SimpleStringProperty(ip);
         this.hostname = new SimpleStringProperty(hostname);
+        this.time = new SimpleDoubleProperty(time);
     }
 
     public void setHop(int hop){ this.hop.set(hop); }
@@ -28,12 +31,17 @@ public class TraceRoute {
     public void setIp(String ip){ this.ip.set(ip); }
 
     public void setHostname(String hostname){ this.hostname.set(hostname); }
+    
+    public void setTime(double time){ this.time.set(time); }
 
     public int getHop(){ return this.hop.get(); }
 
     public String getIp(){ return this.ip.get(); }
 
     public String getHostname(){ return this.hostname.get(); }
+    
+    public double getTime(){ return this.time.get(); }
+
 
     public ArrayList<String> start(String url){
         output = new ArrayList<String>();
@@ -41,7 +49,7 @@ public class TraceRoute {
 
         try{
             Runtime runtime = Runtime.getRuntime();
-            Process process = runtime.exec("traceroute " + url);
+            Process process = runtime.exec("traceroute " + url + " -m 255");
 
             String line;
             in = new BufferedReader(new InputStreamReader(process.getInputStream()));
