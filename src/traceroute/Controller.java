@@ -48,56 +48,65 @@ public class Controller {
 
 	public void handleStart(ActionEvent e) {
 		ObservableList<TraceRoute> data = FXCollections.observableArrayList();
-		String url = textField.getText().trim();
+		new Thread(() -> {
+			String url = textField.getText().trim();
 
-		hopCol.setCellValueFactory(new PropertyValueFactory<>("hop"));
-		ipCol.setCellValueFactory(new PropertyValueFactory<>("ip"));
-		hostnameCol.setCellValueFactory(new PropertyValueFactory<>("hostname"));
-		avgCol.setCellValueFactory(new PropertyValueFactory<>("time"));
+			hopCol.setCellValueFactory(new PropertyValueFactory<>("hop"));
+			ipCol.setCellValueFactory(new PropertyValueFactory<>("ip"));
+			hostnameCol.setCellValueFactory(new PropertyValueFactory<>("hostname"));
+			avgCol.setCellValueFactory(new PropertyValueFactory<>("time"));
 
-		if (!url.isEmpty()) {
-			int n = 0, numHop = 1;
-			ArrayList<String> output = new ArrayList<String>();
-			TraceRoute tr = new TraceRoute();
-			double time;
-			output = tr.start(url);
+			if (!url.isEmpty()) {
+				int n = 0, numHop = 1;
+				ArrayList<String> output = new ArrayList<String>();
+				TraceRoute tr = new TraceRoute();
+				double time;
+				output = tr.start(url);
 
-			for (String x : output) {
-				if (n != 0) {
-					String[] s = x.split(" ");
-					try {
-						if (numHop < 10) {
-							time = Double.parseDouble(s[6]);
-						} else {
-							time = Double.parseDouble(s[5]);
+				for (String x : output) {
+					if (n != 0) {
+						String[] s = x.split(" ");
+						try {
+							if (numHop < 10) {
+								time = Double.parseDouble(s[6]);
+							} else {
+								time = Double.parseDouble(s[5]);
+							}
+						} catch (ArrayIndexOutOfBoundsException | NumberFormatException ex) {
+							time = 0;
 						}
-					} catch (ArrayIndexOutOfBoundsException | NumberFormatException ex) {
-						time = 0;
-					}
-					if (numHop < 10) {
-						t = new TraceRoute(numHop, s[3], s[4], time);
-					} else {
-						t = new TraceRoute(numHop, s[2], s[3], time);
-					}
-					data.add(t);
-					table.setItems(data);
-					series.getData().add(new XYChart.Data<String, Number>(t.getHop()+"", t.getTime()));
+						if (numHop < 10) {
+							t = new TraceRoute(numHop, s[3], s[4], time);
+						} else {
+							t = new TraceRoute(numHop, s[2], s[3], time);
+						}
+						data.add(t);
+						series.getData().add(new XYChart.Data<String, Number>(t.getHop() + "", t.getTime()));
 
-					numHop++;
+						numHop++;
+					}
+
+					n++;
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e1) {
+						e1.printStackTrace();
+					}
 				}
+			} else {
 
-				n++;
 			}
-			chart.getData().add(series);
-		} else {
+		}).start();
+		table.setItems(data);
+		chart.getData().add(series);
 
-		}
 	}
 
 	public void handleClear(ActionEvent e) {
 		textField.clear();
+		series.getData().clear();
 		chart.getData().clear();
 		table.getItems().clear();
 	}
-
+	
 }

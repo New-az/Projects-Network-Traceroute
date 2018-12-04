@@ -49,7 +49,7 @@ public class TraceRoute {
 
         try{
             Runtime runtime = Runtime.getRuntime();
-            Process process = runtime.exec("traceroute " + url + " -m 255");
+            Process process = runtime.exec("traceroute " + url + " -m 99");
 
             String line;
             in = new BufferedReader(new InputStreamReader(process.getInputStream()));
