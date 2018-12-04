@@ -4,17 +4,11 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.chart.AreaChart;
 import javafx.scene.chart.LineChart;
-import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
 public class Controller {
@@ -29,11 +23,11 @@ public class Controller {
 	@FXML
 	TableColumn<TraceRoute, String> hopCol;
 	@FXML
-	TableColumn<TraceRoute, String> ipCol;
-	@FXML
 	TableColumn<TraceRoute, String> hostnameCol;
 	@FXML
-	TableColumn<TraceRoute, String> avgCol;
+	TableColumn<TraceRoute, String> ipCol;
+	@FXML
+	TableColumn<TraceRoute, String> msCol;
 	@FXML
 	LineChart<String, Number> chart;
 
@@ -48,38 +42,39 @@ public class Controller {
 
 	public void handleStart(ActionEvent e) {
 		ObservableList<TraceRoute> data = FXCollections.observableArrayList();
+		String url = textField.getText().trim();
 		new Thread(() -> {
-			String url = textField.getText().trim();
 
 			hopCol.setCellValueFactory(new PropertyValueFactory<>("hop"));
-			ipCol.setCellValueFactory(new PropertyValueFactory<>("ip"));
-			hostnameCol.setCellValueFactory(new PropertyValueFactory<>("hostname"));
-			avgCol.setCellValueFactory(new PropertyValueFactory<>("time"));
+			hostnameCol.setCellValueFactory(new PropertyValueFactory<>("ip"));
+			ipCol.setCellValueFactory(new PropertyValueFactory<>("hostname"));
+			msCol.setCellValueFactory(new PropertyValueFactory<>("time"));
 
 			if (!url.isEmpty()) {
 				int n = 0, numHop = 1;
 				ArrayList<String> output = new ArrayList<String>();
 				TraceRoute tr = new TraceRoute();
-				double time;
 				output = tr.start(url);
 
 				for (String x : output) {
 					if (n != 0) {
+						double time = 0;
+						String host_n = "", ip_n = "";
 						String[] s = x.split(" ");
-						try {
-							if (numHop < 10) {
-								time = Double.parseDouble(s[6]);
-							} else {
-								time = Double.parseDouble(s[5]);
-							}
-						} catch (ArrayIndexOutOfBoundsException | NumberFormatException ex) {
-							time = 0;
+
+						if(numHop < 10) host_n = s[3];
+						else host_n = s[2];
+
+						for(int i=0; i<s.length; i++){
+
+							if(s[i].startsWith("(")) ip_n = s[i].substring(1, s[i].length()-1);
+							else if(s[i].equals("ms")) time = Double.parseDouble(s[i-1]);
+
+							if(!ip_n.isEmpty() && time != 0) break;
 						}
-						if (numHop < 10) {
-							t = new TraceRoute(numHop, s[3], s[4], time);
-						} else {
-							t = new TraceRoute(numHop, s[2], s[3], time);
-						}
+
+						t = new TraceRoute(numHop, host_n, ip_n, time);
+
 						data.add(t);
 						series.getData().add(new XYChart.Data<String, Number>(t.getHop() + "", t.getTime()));
 
@@ -93,13 +88,21 @@ public class Controller {
 						e1.printStackTrace();
 					}
 				}
-			} else {
 
 			}
 		}).start();
+
 		table.setItems(data);
 		chart.getData().add(series);
 
+		if(url.isEmpty()){
+			Alert alert = new Alert(Alert.AlertType.WARNING);
+			alert.setTitle("Warning");
+			alert.setHeaderText(null);
+			alert.setContentText("Please input url");
+
+			alert.showAndWait();
+		}
 	}
 
 	public void handleClear(ActionEvent e) {

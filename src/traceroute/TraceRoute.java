@@ -42,7 +42,6 @@ public class TraceRoute {
     
     public double getTime(){ return this.time.get(); }
 
-
     public ArrayList<String> start(String url){
         output = new ArrayList<String>();
         BufferedReader in = null;
@@ -61,7 +60,7 @@ public class TraceRoute {
             }
             in.close();
         }catch (IOException e){
-
+            System.out.println(e.toString());
         }
         return  output;
     }

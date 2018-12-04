@@ -11,7 +11,7 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("TracerouteUI.fxml"));
-        Scene scene = new Scene(root, 1000, 600);
+        Scene scene = new Scene(root, 1280, 720);
         stage.setResizable(false);
         stage.setTitle("Traceroute App");
         stage.setScene(scene);
