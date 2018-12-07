@@ -41,6 +41,7 @@ public class Controller {
 	}
 
 	public void handleStart(ActionEvent e) {
+		start_btn.setDisable(true);
 		ObservableList<TraceRoute> data = FXCollections.observableArrayList();
 		String url = textField.getText().trim();
 		new Thread(() -> {
@@ -106,6 +107,7 @@ public class Controller {
 	}
 
 	public void handleClear(ActionEvent e) {
+		start_btn.setDisable(false);
 		textField.clear();
 		series.getData().clear();
 		chart.getData().clear();
