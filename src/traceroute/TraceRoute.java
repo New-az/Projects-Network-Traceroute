@@ -10,6 +10,8 @@ import java.net.*;
 import java.util.ArrayList;
 
 public class TraceRoute {
+    private final String os = System.getProperty("os.name").toLowerCase();
+
     private ArrayList<String> output = null;
 
     private SimpleIntegerProperty hop;
@@ -48,7 +50,9 @@ public class TraceRoute {
 
         try{
             Runtime runtime = Runtime.getRuntime();
-            Process process = runtime.exec("traceroute " + url + " -m 99");
+            Process process;
+            if(os.contains("win")) process = runtime.exec("tracert " + url + " -m 99");
+            else  process = runtime.exec("traceroute " + url + " -m 99");
 
             String line;
             in = new BufferedReader(new InputStreamReader(process.getInputStream()));
